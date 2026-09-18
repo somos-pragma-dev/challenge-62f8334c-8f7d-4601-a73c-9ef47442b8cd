@@ -1,0 +1,113 @@
+# Configuración principal de la aplicación Spring Boot
+# Este archivo define las propiedades que Spring utiliza para configurar
+# el contexto de la aplicación, incluyendo datasource, JPA, servidor y propiedades personalizadas
+
+spring:
+  application:
+    # Nombre de la aplicación que se muestra en logs y métricas
+    name: product-catalog
+  
+  # Configuración del datasource (base de datos)
+  datasource:
+    # Driver JDBC para H2 en memoria
+    driver-class-name: org.h2.Driver
+    # URL de conexión a H2: modo en memoria (mem:) con nombre de base de datos (productdb)
+    # La opción DB_CLOSE_DELAY=-1 mantiene la base de datos abierta mientras la JVM corre
+    # MODE=MySQL activa compatibilidades con sintaxis MySQL
+    url: jdbc:h2:mem:productdb;DB_CLOSE_DELAY=-1;MODE=MySQL
+    # Nombre de usuario para conexión a H2 (usuario por defecto)
+    username: sa
+    # Contraseña vacía para H2 en memoria
+    password: 
+    # Configuración del pool de conexiones ( HikariCP por defecto en Spring Boot)
+    hikari:
+      # Tiempo máximo de espera para obtener una conexión del pool
+      connection-timeout: 20000
+      # Tiempo máximo que una conexión puede estar idle (sin uso) en el pool
+      idle-timeout: 300000
+      # Tiempo máximo que una conexión puede estar activa (en uso)
+      max-lifetime: 1200000
+      # Número mínimo de conexiones siempre abiertas en el pool
+      minimum-idle: 2
+      # Número máximo de conexiones en el pool
+      maximum-pool-size: 10
+  
+  # Configuración de JPA/Hibernate
+  jpa:
+    # Implementación de JPA a utilizar (Hibernate por defecto)
+    database-platform: org.hibernate.dialect.H2Dialect
+    # Estrategia de generación de esquemas: create-drop crea el esquema al iniciar
+    # y lo elimina al detener la aplicación (útil para desarrollo y pruebas)
+    hibernate:
+      ddl-auto: create-drop
+    # Mostrar SQL generado por Hibernate en los logs (útil para depuración)
+    show-sql: true
+    # Formatear el SQL mostrado en logs para mejor legibilidad
+    properties:
+      hibernate:
+        format_sql: true
+    # Configuración para abrir/cierre automático de EntityManager
+    open-in-view: false
+  
+  # Configuración de H2 Console (interfaz web para explorar la base de datos)
+  h2:
+    console:
+      # Habilitar la consola web de H2 en /h2-console
+      enabled: true
+      # Permitir acceso desde cualquier dirección IP
+      access-path: /h2-console
+  
+  # Configuración de SQL inicial (data.sql)
+  sql:
+    init:
+      # No ejecutar scripts SQL de inicialización (data.sql se manejará manualmente si es necesario)
+      mode: never
+
+# Configuración del servidor embebido (Tomcat por defecto)
+server:
+  # Puerto donde escuchará el servidor HTTP
+  port: 8080
+  # Configuración de errores HTTP
+  error:
+    # Incluir trace de error en respuestas JSON (solo en desarrollo)
+    include-stacktrace: on_param
+    # Mensaje de error por defecto para respuestas
+    include-message: always
+
+# Configuración personalizada del dominio de productos
+product:
+  # Categorías válidas para productos del catálogo
+  categories:
+    - ELECTRONICS
+    - CLOTHING
+    - FOOD
+    - BOOKS
+    - HOME
+    - SPORTS
+    - TOYS
+  # Límites de validación de negocio
+  limits:
+    # Precio mínimo permitido para un producto
+    min-price: 0.01
+    # Precio máximo permitido (límite de seguridad)
+    max-price: 999999.99
+    # Stock mínimo permitido
+    min-stock: 0
+    # Stock máximo permitido
+    max-stock: 100000
+    # Longitud máxima del nombre del producto
+    max-name-length: 200
+
+# Configuración de logging
+logging:
+  # Nivel de log para paquetes de Spring
+  level:
+    root: INFO
+    com.pragma.productcatalog: DEBUG
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  # Patrón de formato de logs
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
